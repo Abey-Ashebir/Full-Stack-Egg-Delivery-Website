@@ -1,7 +1,7 @@
 export const getAllEggs = () => async (dispatch) => {
   dispatch({ type: "GET_EGGS_REQUEST" });
   try {
-    const response = await fetch("https://back-zkj8.onrender.com/api/geteggs");
+    const response = await fetch("http://localhost:5000/api/geteggs");
     const data = await response.json();
     dispatch({ type: "GET_EGGS_SUCCESS", payload: Array.isArray(data) ? data : [data] });
   } catch (error) {

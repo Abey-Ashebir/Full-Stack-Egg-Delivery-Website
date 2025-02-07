@@ -37,7 +37,7 @@ const AddProduct = ({ onProductAdded }) => {
     }
 
     try {
-      const response = await fetch("https://back-zkj8.onrender.com/api/products", {
+      const response = await fetch("http://localhost:5000/api/products", {
         method: "POST",
         body: formData,
       });
@@ -72,7 +72,7 @@ const AddProduct = ({ onProductAdded }) => {
         <Col md={6}>
           <Card className="shadow">
             <Card.Body>
-              <Card.Title className="text-center mb-4" >Add Product</Card.Title>
+              <Card.Title className="text-center mb-4">Add Product</Card.Title>
               {error && <div className="alert alert-danger">{error}</div>}
               <Form>
                 {/* Form fields */}

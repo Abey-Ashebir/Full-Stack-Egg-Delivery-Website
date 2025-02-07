@@ -42,7 +42,7 @@ const OrdersPage = () => {
     }
 
     try {
-      const response = await fetch("https://back-zkj8.onrender.com/api/orders", {
+      const response = await fetch("http://localhost:5000/api/orders", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +82,7 @@ const OrdersPage = () => {
     const paidAmount = editedPaidAmounts[id] || 0;
 
     try {
-      const response = await fetch(`https://back-zkj8.onrender.com/api/orders/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/orders/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
