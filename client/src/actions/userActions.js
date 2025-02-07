@@ -21,7 +21,7 @@ export const registerUser = (userData) => async (dispatch) => {
     };
 
     // Send registration data to backend
-    const { data } = await axios.post("/api/users/register", userData, config);
+    const { data } = await axios.post("https://back-zkj8.onrender.com/api/users/register", userData, config);
 
     if (!data || !data.token) {
       throw new Error("Registration failed: No token received");
@@ -39,7 +39,6 @@ export const registerUser = (userData) => async (dispatch) => {
     });
   }
 };
-
 // Login User
 export const loginUser = (email, password) => async (dispatch) => {
   try {
@@ -51,7 +50,7 @@ export const loginUser = (email, password) => async (dispatch) => {
       },
     };
 
-    const { data } = await axios.post("/api/users/login", { email, password }, config);
+    const { data } = await axios.post("https://back-zkj8.onrender.com/api/users/login", { email, password }, config);
     console.log("Login response:", data); // Log the response
 
     if (!data || !data.token) {

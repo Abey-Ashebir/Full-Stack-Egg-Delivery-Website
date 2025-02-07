@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 const corsOptions = {
-  origin: process.env.REACT_APP_API_URL || "http://localhost:3000",
+  origin: process.env.REACT_APP_API_URL || "https://back-zkj8.onrender.com",
   credentials: true,
 };
 app.use(cors(corsOptions));
