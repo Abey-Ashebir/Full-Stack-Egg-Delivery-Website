@@ -42,7 +42,7 @@ const OrdersPage = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/orders", {
+      const response = await fetch("https://afrofarm.onrender.com/api/orders", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +82,7 @@ const OrdersPage = () => {
     const paidAmount = editedPaidAmounts[id] || 0;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/orders/${id}`, {
+      const response = await fetch(`https://afrofarm.onrender.com/api/orders/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

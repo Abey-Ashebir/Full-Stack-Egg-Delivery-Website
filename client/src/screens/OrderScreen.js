@@ -73,7 +73,7 @@ export default function OrderScreen() {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/orders/submit", {
+      const response = await fetch("https://afrofarm.onrender.com/api/orders/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),

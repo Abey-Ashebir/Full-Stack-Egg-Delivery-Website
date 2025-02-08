@@ -19,6 +19,7 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
+
 app.use(express.json()); // JSON parsing middleware
 
 const helmet = require("helmet");
@@ -82,7 +83,7 @@ app.post("/api/products", upload.single("image"), async (req, res) => {
 
 // Root Route
 app.get("/", (req, res) => {
-  res.send("<h1>🥚 Egg Delivery API is Running...</h1>");
+  res.send("<h1>🥚 Abey Your Egg Delivery API is Running...</h1>");
 });
 
 // Fetch all orders

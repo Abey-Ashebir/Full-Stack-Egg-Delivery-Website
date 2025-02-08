@@ -25,7 +25,7 @@ export const createOrder = (orderData) => async (dispatch, getState) => {
       },
     };
    
-    const { data } = await axios.post("/api/orders", orderData, config);
+    const { data } = await axios.post("https://afrofarm.onrender.com/api/orders", orderData, config);
 
     dispatch({ type: ORDER_CREATE_SUCCESS, payload: data });
   } catch (error) {
@@ -51,7 +51,7 @@ export const updateOrder = (orderId, updatedData) => async (dispatch, getState) 
       },
     };
 
-    const { data } = await axios.put(`/api/orders/${orderId}`, updatedData, config);
+    const { data } = await axios.put(`https://afrofarm.onrender.com/api/orders/${orderId}`, updatedData, config);
 
     dispatch({ type: ORDER_UPDATE_SUCCESS, payload: data });
   } catch (error) {
@@ -75,7 +75,7 @@ export const getOrderDetails = (orderId) => async (dispatch, getState) => {
       },
     };
 
-    const { data } = await axios.get(`/api/orders/${orderId}`, config);
+    const { data } = await axios.get(`https://afrofarm.onrender.com/api/orders/${orderId}`, config);
 
     dispatch({ type: ORDER_DETAILS_SUCCESS, payload: data });
   } catch (error) {

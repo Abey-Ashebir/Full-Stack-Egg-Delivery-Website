@@ -23,7 +23,7 @@ export default function Footer() {
                 +251916586390              </li>
               <li className="mb-2">
                 <FaEnvelope className="me-2" />
-                johnfekadu@gmail.com
+                johnfekadu307@gmail.com
               </li>
             </ul>
           </div>

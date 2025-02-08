@@ -37,7 +37,7 @@ const AddProduct = ({ onProductAdded }) => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/products", {
+      const response = await fetch("https://afrofarm.onrender.com/api/products", {
         method: "POST",
         body: formData,
       });

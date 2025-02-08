@@ -1,5 +1,5 @@
 import { createStore, combineReducers, applyMiddleware } from "redux";
-import { thunk } from "redux-thunk";
+import  thunk  from "redux-thunk";
 import { eggReducer } from "./reducers/eggReducer";
 import cartReducer from "./reducers/cartReducer";
 import { userRegisterReducer, userLoginReducer } from "./reducers/userReducers";
