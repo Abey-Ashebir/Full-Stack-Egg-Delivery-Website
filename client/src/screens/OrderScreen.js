@@ -113,7 +113,7 @@ export default function OrderScreen() {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 15 }}>
+    <Container maxWidth="sm" sx={{ mt: 5 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold", color: "orange" }}>
           Order Details

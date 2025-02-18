@@ -4,6 +4,8 @@ export const ADD_TO_CART = 'ADD_TO_CART';
 export const INCREASE_QUANTITY = 'INCREASE_QUANTITY';
 export const DECREASE_QUANTITY = 'DECREASE_QUANTITY';
 export const REMOVE_FROM_CART = 'REMOVE_FROM_CART';
+export const CART_RESET = "CART_RESET";
+
 
 export const addToCart = (item) => ({
   type: ADD_TO_CART,
@@ -31,4 +33,7 @@ export const UPDATE_QUANTITY = 'UPDATE_QUANTITY';
 export const updateQuantity = (id, quantity) => ({
   type: UPDATE_QUANTITY,
   payload: { id, quantity },
+});
+export const resetCart = () => ({
+  type: CART_RESET,
 });

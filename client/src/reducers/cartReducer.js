@@ -1,14 +1,15 @@
-import { 
-  ADD_TO_CART, 
-  INCREASE_QUANTITY, 
-  DECREASE_QUANTITY, 
+import {
+  ADD_TO_CART,
+  INCREASE_QUANTITY,
+  DECREASE_QUANTITY,
   REMOVE_FROM_CART,
-  UPDATE_QUANTITY
-} from '../actions/cartActions';
+  UPDATE_QUANTITY,
+  CART_RESET,
+} from "../actions/cartActions";
 
 // Load cart items from localStorage
 const initialState = {
-  cartItems: JSON.parse(localStorage.getItem('cartItems')) || [],
+  cartItems: JSON.parse(localStorage.getItem("cartItems")) || [],
 };
 
 const cartReducer = (state = initialState, action) => {
@@ -18,19 +19,25 @@ const cartReducer = (state = initialState, action) => {
     case ADD_TO_CART:
       // Ensure uniqueness (combine id + variant if applicable)
       const existingItem = state.cartItems.find(
-        (item) => item.id === action.payload.id && item.variant === action.payload.variant
+        (item) =>
+          item.id === action.payload.id &&
+          item.variant === action.payload.variant
       );
 
       if (existingItem) {
         // If the item already exists, update the quantity
         updatedCartItems = state.cartItems.map((item) =>
-          item.id === action.payload.id && item.variant === action.payload.variant
+          item.id === action.payload.id &&
+          item.variant === action.payload.variant
             ? { ...item, quantity: item.quantity + action.payload.quantity }
             : item
         );
       } else {
         // Add the new item
-        updatedCartItems = [...state.cartItems, { ...action.payload, quantity: 1 }];
+        updatedCartItems = [
+          ...state.cartItems,
+          { ...action.payload, quantity: 1 },
+        ];
       }
       break;
 
@@ -50,6 +57,13 @@ const cartReducer = (state = initialState, action) => {
       );
       break;
 
+    case CART_RESET:
+      localStorage.removeItem("cartItems"); // Clear cart from localStorage
+      return {
+        ...state,
+        cartItems: [], // Reset cartItems to an empty array
+      };
+
     case UPDATE_QUANTITY:
       updatedCartItems = state.cartItems.map((item) =>
         item.id === action.payload.id
@@ -59,14 +73,17 @@ const cartReducer = (state = initialState, action) => {
       break;
 
     case REMOVE_FROM_CART:
-      updatedCartItems = state.cartItems.filter((item) => item.id !== action.payload);
+      updatedCartItems = state.cartItems.filter(
+        (item) => item.id !== action.payload
+      );
       break;
 
     default:
       return state;
   }
 
-  localStorage.setItem('cartItems', JSON.stringify(updatedCartItems)); // Save updated cart state
+  // Save updated cart state to localStorage
+  localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
   return { ...state, cartItems: updatedCartItems };
 };
 

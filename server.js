@@ -10,12 +10,14 @@ const Order = require("./models/Order"); // Import the Order model
 const multer = require("multer");
 const path = require("path");
 const Product = require("./models/Product"); // Import the Product model
+const rateLimit = require("express-rate-limit"); // Import rateLimit
+const { body, validationResult } = require("express-validator"); // Import express-validator
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 const corsOptions = {
-  origin: process.env.REACT_APP_API_URL || "https://afrofarm.netlify.app",
+  origin: ["https://afrofarm.netlify.app", "http://localhost:3000"], // Allow both production and development URLs
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -24,9 +26,16 @@ app.use(express.json()); // JSON parsing middleware
 
 const helmet = require("helmet");
 app.use(helmet());
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+app.use(limiter);
+
 // Multer configuration for image upload
 const storage = multer.diskStorage({
-
   destination: (req, file, cb) => {
     cb(null, "uploads/");
   },
@@ -52,6 +61,41 @@ const env = cleanEnv(process.env, {
   MONGO_URI: str(),
 });
 
+const Feedback = require("./models/feedbackModel");
+
+// Backend API to save feedback
+app.post("/api/feedback", async (req, res) => {
+  const { name, phone, comment, rating } = req.body;
+
+  try {
+    const feedback = new Feedback({ name, phone, comment, rating });
+    await feedback.save();
+    res.status(201).json({ message: "Feedback saved successfully!" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to save feedback." });
+  }
+});
+
+// Fetch all feedbacks
+app.get("/api/feedbacks", async (req, res) => {
+  try {
+    const feedbacks = await Feedback.find({});
+    res.json(feedbacks);
+  } catch (error) {
+    console.error("Error fetching feedbacks:", error);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.delete("/api/feedbacks/:id", async (req, res) => {
+  const { id } = req.params;
+  const feedback = await Feedback.findByIdAndDelete(id);
+  if (!feedback) {
+    return res.status(404).json({ message: "Feedback not found" });
+  }
+  res.json({ message: "Feedback deleted successfully" });
+});
+
 // Add Product Endpoint
 app.post("/api/products", upload.single("image"), async (req, res) => {
   try {
@@ -60,7 +104,9 @@ app.post("/api/products", upload.single("image"), async (req, res) => {
 
     // Validate input
     if (!name || !variantType || !price || !quantity) {
-      return res.status(400).json({ success: false, message: "All fields are required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "All fields are required" });
     }
 
     // Create a new product
@@ -75,9 +121,17 @@ app.post("/api/products", upload.single("image"), async (req, res) => {
     // Save the product to the database
     await newProduct.save();
 
-    res.status(201).json({ success: true, message: "Product added successfully!", product: newProduct });
+    res.status(201).json({
+      success: true,
+      message: "Product added successfully!",
+      product: newProduct,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to add product", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Failed to add product",
+      error: error.message,
+    });
   }
 });
 
@@ -95,23 +149,30 @@ app.get("/api/orders", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch orders" });
   }
 });
+
 app.get("/api/products", async (req, res) => {
   try {
     const products = await Product.find(); // Fetch all products from the database
     res.status(200).json({ success: true, products });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to fetch products", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch products",
+      error: error.message,
+    });
   }
 });
+
 // Update an order
 app.put("/api/orders/:id", async (req, res) => {
   try {
-
     const { id } = req.params; // Get _id from URL
     const { status, paidAmount } = req.body;
 
     if (!status || paidAmount === undefined) {
-      return res.status(400).json({ message: "Status and paidAmount are required" });
+      return res
+        .status(400)
+        .json({ message: "Status and paidAmount are required" });
     }
 
     // Find the order by _id
@@ -137,10 +198,6 @@ app.put("/api/orders/:id", async (req, res) => {
   }
 });
 
-
-
-
-
 // Insert egg variants if none exist
 async function insertEggVariants() {
   try {
@@ -152,6 +209,7 @@ async function insertEggVariants() {
       await EggVariant.insertMany(eggVariants);
     }
   } catch (err) {
+    console.error("Error inserting egg variants:", err);
   }
 }
 
@@ -176,27 +234,43 @@ mongoose.connection.on("connected", () => {
   });
 
   // User Registration
-  app.post("/api/users/register", async (req, res) => {
-    try {
-      const { name, email, password } = req.body;
-      const existingUser = await User.findOne({ email });
-
-      if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
+  app.post(
+    "/api/users/register",
+    [
+      body("email").isEmail().normalizeEmail(),
+      body("password").isLength({ min: 8 }),
+    ],
+    async (req, res) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
       }
 
-      const user = new User({ name, email, password });
-      await user.save();
+      try {
+        const { name, email, password } = req.body;
+        const existingUser = await User.findOne({ email });
 
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
+        if (existingUser) {
+          return res.status(400).json({ message: "User already exists" });
+        }
 
-      res.status(201).json({ message: "User registered successfully", token, user });
-    } catch (error) {
-      res.status(500).json({ message: "Registration failed", error: error.message });
+        const user = new User({ name, email, password });
+        await user.save();
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+          expiresIn: "1h",
+        });
+
+        res
+          .status(201)
+          .json({ message: "User registered successfully", token, user });
+      } catch (error) {
+        res
+          .status(500)
+          .json({ message: "Registration failed", error: error.message });
+      }
     }
-  });
+  );
 
   // Login User
   app.post("/api/users/login", async (req, res) => {
@@ -217,8 +291,6 @@ mongoose.connection.on("connected", () => {
         expiresIn: "30d",
       });
 
-    
-
       res.status(200).json({
         message: "Login successful",
         token,
@@ -238,9 +310,17 @@ mongoose.connection.on("connected", () => {
   // Order Submission Route
   app.post("/api/orders/submit", async (req, res) => {
     try {
-      const { customerName, email, phone, address, orderItems, totalPrice } = req.body;
+      const { customerName, email, phone, address, orderItems, totalPrice } =
+        req.body;
 
-      if (!customerName || !email || !phone || !address || !orderItems || orderItems.length === 0) {
+      if (
+        !customerName ||
+        !email ||
+        !phone ||
+        !address ||
+        !orderItems ||
+        orderItems.length === 0
+      ) {
         return res.status(400).json({ message: "All fields are required" });
       }
 
@@ -255,9 +335,13 @@ mongoose.connection.on("connected", () => {
       });
 
       await newOrder.save();
-      res.status(201).json({ message: "Order submitted successfully", order: newOrder });
+      res
+        .status(201)
+        .json({ message: "Order submitted successfully", order: newOrder });
     } catch (error) {
-      res.status(500).json({ message: "Order submission failed", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Order submission failed", error: error.message });
     }
   });
 

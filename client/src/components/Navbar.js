@@ -1,10 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef,useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../actions/userActions";
-import { FaUserCircle } from "react-icons/fa"; // User Icon (FontAwesome)
-import logo from "../assets/AfroFarming.jpg"; // Import the logo
+import {
+  FaUserCircle,
+  FaShoppingCart,
+  FaCommentDots,
+  FaSignInAlt,
+} from "react-icons/fa";
+import logo from "../assets/AfroFarming.jpg";
 import "../App.css";
+import { resetCart } from "../actions/cartActions";
 
 export default function Navbar() {
   const cartItems = useSelector((state) => state.cart.cartItems);
@@ -12,14 +18,26 @@ export default function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showUserInfo, setShowUserInfo] = useState(false);
+  const [isNavExpanded, setIsNavExpanded] = useState(false); // Track navbar expansion
   const dropdownRef = useRef(null);
+
+  // Add/remove class to body when navbar is expanded
+  useEffect(() => {
+    if (isNavExpanded) {
+      document.body.classList.add("navbar-expanded");
+    } else {
+      document.body.classList.remove("navbar-expanded");
+    }
+  }, [isNavExpanded]);
 
   const handleLoginClick = () => {
     navigate("/login");
   };
 
   const handleLogout = () => {
+    dispatch(resetCart());
     dispatch(logoutUser());
+    localStorage.removeItem("cart");
     navigate("/");
   };
 
@@ -50,8 +68,11 @@ export default function Navbar() {
     >
       <div className="container">
         {/* Brand Logo */}
-        <a className="navbar-brand fw-bold text-warning fs-4" href="/">
-          <img src={logo} alt="Afro Farming Logo" className="navbar-logo" />
+        <a
+          className="navbar-brand fw-bold text-warning fs-4 d-flex align-items-center"
+          href="/"
+        >
+          <img src={logo} alt="Afro Farming Logo" className="navbar-logo me-2" />
           AFRO FARMING
         </a>
 
@@ -59,24 +80,33 @@ export default function Navbar() {
         <button
           className="navbar-toggler"
           type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
+          onClick={() => setIsNavExpanded(!isNavExpanded)} // Toggle navbar expansion
         >
           <span className="navbar-toggler-icon"></span>
         </button>
 
         {/* Navbar Items */}
         <div
-          className="collapse navbar-collapse justify-content-end"
+          className={`collapse navbar-collapse ${isNavExpanded ? "show" : ""}`}
           id="navbarNav"
         >
           <ul className="navbar-nav align-items-center">
             <li className="nav-item">
-              <a className="nav-link fw-bold text-warning fs-5" href="/cart">
-                🛒 Cart ({cartItems.length})
+              <a
+                className="nav-link fw-bold text-warning fs-5 d-flex align-items-center"
+                href={isAdmin ? "/admin/feedback" : "/feedback"}
+              >
+                <FaCommentDots className="me-2" />{" "}
+                {isAdmin ? "See Feedback" : "Feedback"}
+              </a>
+            </li>
+
+            <li className="nav-item">
+              <a
+                className="nav-link fw-bold text-warning fs-5 d-flex align-items-center"
+                href="/cart"
+              >
+                <FaShoppingCart className="me-2" /> Cart ({cartItems.length})
               </a>
             </li>
 
@@ -89,7 +119,9 @@ export default function Navbar() {
                   style={{ background: "none", border: "none" }}
                 >
                   <FaUserCircle size={28} className="me-2" />
-                  <span className="d-sm-inline fw-bold text-warning" >{userInfo.name}</span>
+                  <span className="d-sm-inline fw-bold text-warning">
+                    {userInfo.name}
+                  </span>
                 </button>
 
                 {/* Dropdown Menu */}
@@ -117,10 +149,10 @@ export default function Navbar() {
             ) : (
               <li className="nav-item">
                 <button
-                  className="btn btn-warning fw-bold px-4 rounded-pill shadow-sm"
+                  className="btn btn-warning fw-bold px-4 rounded-pill shadow-sm d-flex align-items-center"
                   onClick={handleLoginClick}
                 >
-                  Login
+                  <FaSignInAlt className="me-2" /> Login
                 </button>
               </li>
             )}

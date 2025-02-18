@@ -33,7 +33,7 @@ export default function CartScreen() {
   const handleIncreaseQuantity = (id) => {
     dispatch(increaseQuantity(id));
   };
-
+ 
   const handleDecreaseQuantity = (id) => {
     dispatch(decreaseQuantity(id));
   };
@@ -69,7 +69,7 @@ export default function CartScreen() {
     <Box sx={{ p: 3 }}>
       <Typography
         variant="h4"
-        sx={{ mb: 3, mt: 15, fontWeight: "bold", color: "warning.main" }}
+        sx={{ mb: 3, fontWeight: "bold", color: "warning.main" }}
       >
         Your Cart
       </Typography>

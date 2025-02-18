@@ -56,7 +56,7 @@ export default function RegisterScreen() {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100" style={{ marginTop: '85px' }}>
+    <div className="container d-flex justify-content-center align-items-center vh-100" >
       <div className="card shadow-lg p-4" style={{ width: "100%", maxWidth: "500px" }}>
         <h2 className="text-center mb-20">Register</h2>
         <form onSubmit={handleSubmit}>

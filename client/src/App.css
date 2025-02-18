@@ -3,6 +3,11 @@
   height: 50px;
   margin-right: 10px;
 }
+/* Add margin to the body when the navbar is expanded */
+body.navbar-expanded {
+  padding-top: 200px; /* Adjust this value based on your navbar height */
+}
+
 
 /* Mobile Optimization */
 @media (max-width: 768px) {
@@ -57,8 +62,34 @@
 /* ================= General Styles ================ */
 .App {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
+/* Ensure content stays below navbar and above footer */
+.content {
+  flex: 1;
+  padding: 20px;
+  padding-top: 80px; /* Default padding for fixed navbar */
+  margin-top: 60px; /* Adjust according to navbar height */
+}
+
+/* Footer should always be at the bottom */
+footer {
+  margin-top: auto;
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .content {
+    padding: 10px;
+    margin-top: 50px; /* Adjust for smaller navbar */
+  }
+}
+
+/* Adjust header styling */
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -89,10 +120,3 @@
     transform: rotate(360deg);
   }
 }
-
-/* Hide animation if motion reduction is preferred */
-/* @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-} */
