@@ -21,7 +21,7 @@ export const registerUser = (userData) => async (dispatch) => {
     };
 
     // Send registration data to backend
-    const { data } = await axios.post("https://afrofarm.onrender.com/api/users/register", userData, config);
+const { data } = await axios.post("/api/users/register", userData, config);
 
     if (!data || !data.token) {
       throw new Error("Registration failed: No token received");
