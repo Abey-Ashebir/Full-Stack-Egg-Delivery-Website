@@ -234,44 +234,47 @@ mongoose.connection.on("connected", () => {
     }
   });
 
-  // User Registration
-  app.post(
-    "/api/users/register",
-    [
-      body("email").isEmail().normalizeEmail(),
-      body("password").isLength({ min: 8 }),
-    ],
-    async (req, res) => {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
+app.post(
+  "/api/users/register",
+  [
+    // Make email optional, only validate if provided
+    body("email").optional().isEmail().normalizeEmail(),
+    
+    // Set minimum password length to 2 characters
+    body("password").isLength({ min: 2 }).withMessage("Password must be at least 2 characters long"),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-      try {
-        const { name, email, password } = req.body;
+    try {
+      const { name, email, password } = req.body;
+
+      // If email is provided, check if the user already exists
+      if (email) {
         const existingUser = await User.findOne({ email });
-
         if (existingUser) {
           return res.status(400).json({ message: "User already exists" });
         }
-
-        const user = new User({ name, email, password });
-        await user.save();
-
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-          expiresIn: "1h",
-        });
-
-        res
-          .status(201)
-          .json({ message: "User registered successfully", token, user });
-      } catch (error) {
-        res
-          .status(500)
-          .json({ message: "Registration failed", error: error.message });
       }
+
+      // Create new user without requiring email
+      const user = new User({ name, email: email || "", password });
+      await user.save();
+
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+
+      res.status(201).json({ message: "User registered successfully", token, user });
+    } catch (error) {
+      res.status(500).json({ message: "Registration failed", error: error.message });
     }
-  );
+  }
+);
+
 
   // Login User
   app.post("/api/users/login", async (req, res) => {
