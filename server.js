@@ -18,6 +18,7 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 const corsOptions = {
 origin: ["https://afrofarm.netlify.app", "http://localhost:3000"], // Allow both production and development URLs
+methods: "GET, POST, PUT, DELETE",
 credentials: true,
 };
 app.use(cors(corsOptions));
